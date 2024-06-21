@@ -10,18 +10,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
+using The_Book_Store.Admin.classes;
 
 namespace The_Book_Store.Admin
 {
     public partial class FormCreateAccount : Form
     {
-        SqlConnection cn = new SqlConnection();
-        SqlCommand cm = new SqlCommand();
-        DBConnection dbcon = new DBConnection();
+        UserManager userManager;
         public FormCreateAccount()
         {
             InitializeComponent();
-            cn = new SqlConnection(dbcon.MyConnection());
+            userManager = new UserManager();
         }
         private void Clear()
         {
@@ -51,6 +50,14 @@ namespace The_Book_Store.Admin
         }
         private void BtnSave_Click(object sender, EventArgs e)
         {
+            User user = new User
+            {
+                Username = textBoxUsername.Text,
+                Password = textBoxPassword.Text,
+                Role = comboBoxRole.Text,
+                Name = textBoxName.Text,
+
+            };
             if(IsTextBoxValid(textBoxUsername) &&
                 IsTextBoxKrpytonValid(textBoxPassword) &&
                 IsTextBoxKrpytonValid(textBoxConfirmPassword) &&
@@ -64,22 +71,16 @@ namespace The_Book_Store.Admin
                         MessageBox.Show("Password not match", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         return;
                     }
-                    cn.Open();
-                    cm = new SqlCommand("insert into tblUser (username, password, role, name) values(@username, @password, @role, @name)", cn);
-                    cm.Parameters.AddWithValue("@username", textBoxUsername.Text);
-                    cm.Parameters.AddWithValue("@password", textBoxPassword.Text);
-                    cm.Parameters.AddWithValue("@role", comboBoxRole.Text);
-                    cm.Parameters.AddWithValue("@name", textBoxName.Text);
-                    cm.ExecuteNonQuery();
-                    cn.Close();
-                    MessageBox.Show("New account has been saved successfully!");
-                    Clear();
-                    
+                    bool success = userManager.CreateAccount(user);
+                    if (success)
+                    {
+                        MessageBox.Show("New account has been saved successfully!");
+                        Clear();
+                        textBoxUsername.Focus();
+                    }
                 }
                 catch (Exception ex)
                 {
-                    cn.Close();
-                    MessageBox.Show($"Username [{textBoxUsername.Text}] has already taken.", "Failed Create Account", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     textBoxPassword.Clear();
                     textBoxConfirmPassword.Clear();
                     textBoxUsername.Focus();

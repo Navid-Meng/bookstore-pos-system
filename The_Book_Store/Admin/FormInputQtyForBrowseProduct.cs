@@ -32,8 +32,12 @@ namespace The_Book_Store.Admin
         {
             if (e.KeyChar == (char)Keys.Enter)
             {
-                BtnOK.PerformClick();
-                OkButtonClicked = true;
+                if (!string.IsNullOrWhiteSpace(textBoxQty.Text) && int.TryParse(textBoxQty.Text, out _))
+                {
+                    BtnOK.PerformClick();
+                    OkButtonClicked = true;
+                }
+
             }else if (e.KeyChar == (char)Keys.Escape)
             {
                 BtnCancel.PerformClick();
@@ -47,8 +51,15 @@ namespace The_Book_Store.Admin
 
         private void BtnOK_Click(object sender, EventArgs e)
         {
-            OkButtonClicked = true;
-            this.Close();
+            if (!string.IsNullOrWhiteSpace(textBoxQty.Text) && int.TryParse(textBoxQty.Text, out _))
+            {
+                OkButtonClicked = true;
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("You must enter the qty with the integer.");
+            }
         }
     }
 }

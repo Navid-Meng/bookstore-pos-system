@@ -5,59 +5,37 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using The_Book_Store.Admin.classes;
+
 namespace The_Book_Store.Admin
 {
     public partial class FormProductModule : Form
     {
         private bool isNew;
-        SqlConnection cn = new SqlConnection();
-        SqlCommand cm = new SqlCommand();
-        DBConnection dbcon = new DBConnection();
-        SqlDataReader sqlDataReader = null;
         private FormManageBook formManageBook;
+        private readonly BookManager _bookManager;
         public FormProductModule(FormManageBook formManageBook, bool isNew)
         {
             InitializeComponent();
-            cn = new SqlConnection(dbcon.MyConnection());
             this.isNew = isNew;
             this.formManageBook = formManageBook;
-
+            _bookManager = new BookManager();
         }
         public void LoadGenre()
         {
-            try
-            {
-                cn.Open();
-                cm = new SqlCommand("SELECT genre FROM tblGenre", cn);
-                sqlDataReader = cm.ExecuteReader();
-                comboBoxGenre.Items.Clear();
-                while (sqlDataReader.Read())
-                {
-                    comboBoxGenre.Items.Add(sqlDataReader[0].ToString());
-                }
-                sqlDataReader.Close();
-                cn.Close();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }
+            List<string> genres = _bookManager.GetGenres();
+            comboBoxGenre.Items.Clear();
+            comboBoxGenre.Items.AddRange(genres.ToArray());
         }
         public void LoadPublisher()
         {
-            comboBoxPublisher.Items.Clear();
-            cn.Open();
-            cm = new SqlCommand("SELECT publisher FROM tblPublisher", cn);
-            sqlDataReader = cm.ExecuteReader();
-            while (sqlDataReader.Read())
-            {
-                comboBoxPublisher.Items.Add(sqlDataReader[0].ToString());
-            }
-            sqlDataReader.Close();
-            cn.Close();
+            List<string> publishers = _bookManager.GetPublishers();
+            comboBoxPublisher.Items.Clear();    
+            comboBoxPublisher.Items.AddRange(publishers.ToArray());
         }
         public void Clear()
         {
@@ -98,45 +76,27 @@ namespace The_Book_Store.Admin
                     {
                         if (MessageBox.Show("Are you sure you want to save this book?", "Save Book", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         {
-                            string genreId = "", publisherId = "";
-                            cn.Open();
-                            cm = new SqlCommand("SELECT id from tblGenre WHERE genre like '" + comboBoxGenre.Text + "'", cn);
-                            sqlDataReader = cm.ExecuteReader();
-                            sqlDataReader.Read();
-                            if (sqlDataReader.HasRows)
-                            {
-                                genreId = sqlDataReader[0].ToString();
-                            }
-                            sqlDataReader.Close();
-                            cn.Close();
 
-                            cn.Open();
-                            cm = new SqlCommand("SELECT id from tblPublisher WHERE publisher like '" + comboBoxPublisher.Text + "'", cn);
-                            sqlDataReader = cm.ExecuteReader();
-                            sqlDataReader.Read();
-                            if (sqlDataReader.HasRows)
+                            string genreName = comboBoxGenre.Text;
+                            string publisherName = comboBoxPublisher.Text;
+                            Book newBook = new Book
                             {
-                                publisherId = sqlDataReader[0].ToString();
-                            }
-                            sqlDataReader.Close();
-                            cn.Close();
+                                BookCode = textBoxBookCode.Text,
+                                BookTitle = textBoxTitle.Text,
+                                BookAuthor = textBoxAuthor.Text,
+                                BookPublisher = new Publisher { PublisherName = publisherName },
+                                BookGenre = new Genre { GenreName = genreName },
+                                Price = decimal.Parse(textBoxPrice.Text),
+                                Quantity = int.Parse(textBoxQty.Text),
+                            };
 
-                            cn.Open();
-                            cm = new SqlCommand("INSERT INTO tblBook(bookCode, bookTitle, bookAuthor, publisherID, genreID, price, qty) VALUES (@bookCode, @bookTitle, @bookAuthor, @publisherID, @genreID, @price, @qty)", cn);
-                            cm.Parameters.AddWithValue("@bookCode", textBoxBookCode.Text);
-                            cm.Parameters.AddWithValue("@bookTitle", textBoxTitle.Text);
-                            cm.Parameters.AddWithValue("@bookAuthor", textBoxAuthor.Text);
-                            cm.Parameters.AddWithValue("@publisherID", publisherId);
-                            cm.Parameters.AddWithValue("@genreID", genreId);
-                            cm.Parameters.AddWithValue("@price", textBoxPrice.Text);
-                            cm.Parameters.AddWithValue("@qty", textBoxQty.Text);
-                            cm.ExecuteNonQuery();
-                            cn.Close();
+                            _bookManager.SaveBook(newBook);
+
                             MessageBox.Show("Book has been saved successfully!");
                             Clear();
                             formManageBook.LoadRecords();
-                            LoadGenre();
                             LoadPublisher();
+                            LoadGenre();
                         }
                     }
                     catch (Exception ex)
@@ -185,40 +145,17 @@ namespace The_Book_Store.Admin
                     {
                         if (MessageBox.Show("Are you sure you want to update this book?", "Update Book", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         {
-                            string genreId = "", publisherId = "";
-                            cn.Open();
-                            cm = new SqlCommand("SELECT id from tblGenre WHERE genre like '" + comboBoxGenre.Text + "'", cn);
-                            sqlDataReader = cm.ExecuteReader();
-                            sqlDataReader.Read();
-                            if (sqlDataReader.HasRows)
+                            Book editedBook = new Book
                             {
-                                genreId = sqlDataReader[0].ToString();
-                            }
-                            sqlDataReader.Close();
-                            cn.Close();
-
-                            cn.Open();
-                            cm = new SqlCommand("SELECT id from tblPublisher WHERE publisher like '" + comboBoxPublisher.Text + "'", cn);
-                            sqlDataReader = cm.ExecuteReader();
-                            sqlDataReader.Read();
-                            if (sqlDataReader.HasRows)
-                            {
-                                publisherId = sqlDataReader[0].ToString();
-                            }
-                            sqlDataReader.Close();
-                            cn.Close();
-
-                            cn.Open();
-                            cm = new SqlCommand("UPDATE tblBook SET bookTitle = @bookTitle, bookAuthor = @bookAuthor, publisherID=@publisherID, genreID=@genreID, price=@price, qty=@qty WHERE bookCode LIKE @bookCode", cn);
-                            cm.Parameters.AddWithValue("@bookCode", textBoxBookCode.Text);
-                            cm.Parameters.AddWithValue("@bookTitle", textBoxTitle.Text);
-                            cm.Parameters.AddWithValue("@bookAuthor", textBoxAuthor.Text);
-                            cm.Parameters.AddWithValue("@publisherID", publisherId);
-                            cm.Parameters.AddWithValue("@genreID", genreId);
-                            cm.Parameters.AddWithValue("@price", textBoxPrice.Text);
-                            cm.Parameters.AddWithValue("@qty", textBoxQty.Text);
-                            cm.ExecuteNonQuery();
-                            cn.Close();
+                                BookCode = textBoxBookCode.Text,
+                                BookTitle = textBoxTitle.Text,
+                                BookAuthor = textBoxAuthor.Text,
+                                BookPublisher = new Publisher { PublisherName = comboBoxPublisher.Text },
+                                BookGenre = new Genre { GenreName = comboBoxGenre.Text },
+                                Price = decimal.Parse(textBoxPrice.Text),
+                                Quantity = int.Parse(textBoxQty.Text),
+                            };
+                            _bookManager.EditBook(editedBook);
                             MessageBox.Show("Book has been updated successfully!");
                             Clear();
                             formManageBook.LoadRecords();
@@ -228,7 +165,7 @@ namespace The_Book_Store.Admin
                     catch (Exception ex)
                     {
                         MessageBox.Show(ex.Message);
-                        cn.Close();
+                        
                     }
                 }
                 else

@@ -19,11 +19,11 @@ namespace The_Book_Store.Auth
         SqlCommand cm = new SqlCommand();
         SqlDataReader dr;
         DBConnection dbcon = new DBConnection();
+        
         public FormLogin2()
         {
             InitializeComponent();
             cn = new SqlConnection(dbcon.MyConnection());
-
         }
 
         private void BtnLogin_Click(object sender, EventArgs e)
@@ -58,10 +58,6 @@ namespace The_Book_Store.Auth
                         formCashier.lblUsername.Text = textBoxUsername.Text;
                         formCashier.lblRole.Text = role;
                         formCashier.Show();
-                        /*  formCashier form = new formCashier(this);*/
-                        /*    form.lblUsername.Text = txtUsername.Text;
-                            form.lblRole.Text = role;
-                            form.ShowDialog();*/
                     }
                     else if (role == "Admin")
                     {

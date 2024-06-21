@@ -46,6 +46,10 @@ namespace The_Book_Store.Admin
         private void dataGridViewPublisher_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             string colName = dataGridViewPublisher.Columns[e.ColumnIndex].Name;
+            if (colName != "Edit" && colName != "Delete")
+            {
+                return;
+            }
             if (colName == "Edit")
             {
                 FormPublisherModule2 formPublisherModule = new FormPublisherModule2(this, false);

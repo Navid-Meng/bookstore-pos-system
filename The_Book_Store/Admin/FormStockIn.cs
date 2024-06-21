@@ -42,6 +42,10 @@ namespace The_Book_Store.Admin
         private void dataGridViewStockIn_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             string colName = dataGridViewStockIn.Columns[e.ColumnIndex].Name;
+            if (colName != "Delete")
+            {
+                return;
+            }
             if (colName == "Delete")
             {
                 if (MessageBox.Show("Are you sure you want to delete this record?", "Delete Record", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)

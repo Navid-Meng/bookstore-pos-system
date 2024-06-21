@@ -8,46 +8,25 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using The_Book_Store.Admin.classes;
 
 namespace The_Book_Store.Admin
 {
     public partial class FormActivateDeactivate : Form
     {
         //string connectionString = @"Data Source=ViD3107\SQLEXPRESS;Initial Catalog=POS_BOOK;Integrated Security=True";
-        DBConnection connectionString = new DBConnection();
+        UserManager userManager;
         
         public FormActivateDeactivate()
         {
             InitializeComponent();
+            userManager = new UserManager();
         }
         public void ClearTextBox()
         {
             textBoxUsername.Clear();
         }
-        private bool UpdateAccountStatus(string username, bool isActive)
-        {
-            try
-            {
-                using (SqlConnection conn = new SqlConnection(connectionString.MyConnection()))
-                {
-                    conn.Open();
-                    string updateQuery = "UPDATE tblUser SET isActive = @IsActive WHERE username = @Username";
-                    using (SqlCommand cmd = new SqlCommand(updateQuery, conn))
-                    {
-                        cmd.Parameters.AddWithValue("@IsActive", isActive);
-                        cmd.Parameters.AddWithValue("@Username", username);
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        return rowsAffected > 0;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"An error occurred: {ex.Message}");
-                return false;
-            }
-        }
-
+        
         private void button2_Click(object sender, EventArgs e)
         {
         }
@@ -56,7 +35,7 @@ namespace The_Book_Store.Admin
         {
             string username = textBoxUsername.Text;
             bool isActive = checkBoxIsActive.Checked;
-            bool updatedStatus = UpdateAccountStatus(username, isActive);   
+            bool updatedStatus = userManager.UpdateAccountStatus(username, isActive);   
             if (updatedStatus)
             {
                 MessageBox.Show($"Account {username} is now {(isActive ? "activated" : "deactivated")}.");

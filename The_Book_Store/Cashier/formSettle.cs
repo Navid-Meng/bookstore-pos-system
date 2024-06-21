@@ -21,6 +21,7 @@ namespace The_Book_Store.Cashier
         SqlDataReader dr;
         DBConnection dbcon = new DBConnection();
         formCashier form;
+        cashier order = new cashier();
         public formSettle(formCashier fc)
         {
             InitializeComponent();
@@ -136,15 +137,17 @@ namespace The_Book_Store.Cashier
                     
                     for(int i = 0; i<form.dataGridView1.Rows.Count; i++)
                     {
-                        cn.Open();
-                        cm = new SqlCommand("update tblBook set qty = qty - " + int.Parse(form.dataGridView1.Rows[i].Cells[4].Value.ToString())+"where bookCode = '" + form.dataGridView1.Rows[i].Cells[2].Value.ToString()+ "'", cn);
-                        cm.ExecuteNonQuery();
-                        cn.Close();
+                        order.payment(int.Parse(form.dataGridView1.Rows[i].Cells[4].Value.ToString()), form.dataGridView1.Rows[i].Cells[2].Value.ToString(), int.Parse(form.dataGridView1.Rows[i].Cells[1].Value.ToString()));
 
-                        cn.Open();
-                        cm = new SqlCommand("update tblCart set status = 'Sold' where id like '"+ int.Parse(form.dataGridView1.Rows[i].Cells[1].Value.ToString()) +"'", cn);
-                        cm.ExecuteNonQuery();
-                        cn.Close();
+                        //cn.Open();
+                        //cm = new SqlCommand("update tblBook set qty = qty - " + int.Parse(form.dataGridView1.Rows[i].Cells[4].Value.ToString())+"where bookCode = '" + form.dataGridView1.Rows[i].Cells[2].Value.ToString()+ "'", cn);
+                        //cm.ExecuteNonQuery();
+                        //cn.Close();
+
+                        //cn.Open();
+                        //cm = new SqlCommand("update tblCart set status = 'Sold' where id like '"+ int.Parse(form.dataGridView1.Rows[i].Cells[1].Value.ToString()) +"'", cn);
+                        //cm.ExecuteNonQuery();
+                        //cn.Close();
                     }
                     MessageBox.Show("Payment Saved Successfully!","Payment", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     form.loadCart();

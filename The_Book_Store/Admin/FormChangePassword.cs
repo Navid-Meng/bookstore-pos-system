@@ -8,14 +8,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using The_Book_Store.Admin.classes;
 
 namespace The_Book_Store.Admin
 {
     public partial class FormChangePassword : Form
     {
+        UserManager UserManager;
         public FormChangePassword()
         {
             InitializeComponent();
+            UserManager = new UserManager();
         }
         public void ClearTextBox()
         {
@@ -32,8 +35,7 @@ namespace The_Book_Store.Admin
             string confirmPassword = textBoxConfirmPassword.Text;
             if (newPassword == confirmPassword)
             {
-                PasswordChange passwordChanger = new PasswordChange();
-                bool passwordChanged = passwordChanger.ChangePassword(username, oldPassword, newPassword);
+                bool passwordChanged = UserManager.ChangePassword(username, oldPassword, newPassword);
                 if (passwordChanged)
                 {
                     MessageBox.Show("Password changed successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);

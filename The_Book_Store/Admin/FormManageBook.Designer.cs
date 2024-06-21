@@ -40,7 +40,7 @@
             this.panel3 = new System.Windows.Forms.Panel();
             this.dataGridViewManageBook = new System.Windows.Forms.DataGridView();
             this.ColumnNumber = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ColumnID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.BookCode = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column5 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ColumnPublisher = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -150,7 +150,7 @@
             this.dataGridViewManageBook.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
             this.dataGridViewManageBook.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.ColumnNumber,
-            this.ColumnID,
+            this.BookCode,
             this.Column1,
             this.Column5,
             this.ColumnPublisher,
@@ -185,13 +185,13 @@
             this.ColumnNumber.Name = "ColumnNumber";
             this.ColumnNumber.ReadOnly = true;
             // 
-            // ColumnID
+            // BookCode
             // 
-            this.ColumnID.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
-            this.ColumnID.HeaderText = "BCODE";
-            this.ColumnID.Name = "ColumnID";
-            this.ColumnID.ReadOnly = true;
-            this.ColumnID.Width = 94;
+            this.BookCode.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.AllCells;
+            this.BookCode.HeaderText = "BCODE";
+            this.BookCode.Name = "BookCode";
+            this.BookCode.ReadOnly = true;
+            this.BookCode.Width = 94;
             // 
             // Column1
             // 
@@ -289,7 +289,7 @@
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.DataGridView dataGridViewManageBook;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnNumber;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ColumnID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn BookCode;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column1;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column5;
         private System.Windows.Forms.DataGridViewTextBoxColumn ColumnPublisher;

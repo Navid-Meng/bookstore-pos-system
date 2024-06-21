@@ -15,8 +15,7 @@ namespace The_Book_Store.Cashier
 {
     public partial class FormQty : Form
     {
-
-
+        cashier order = new cashier();
         SqlConnection cn = new SqlConnection();
         SqlCommand cm = new SqlCommand();
         SqlDataReader dr;
@@ -51,21 +50,11 @@ namespace The_Book_Store.Cashier
         }
 
         private void txtQty_KeyPress(object sender, KeyPressEventArgs e)
-        
         {
-            if (e.KeyChar == 13 && txtQty.Text != string.Empty)
+            
+            if (e.KeyChar == 13 && txtQty.Text != string.Empty && int.TryParse(txtQty.Text, out _))
             {
-                cn.Open();
-                cm = new SqlCommand("insert into tblCart (transno, pid, price, qty, sdate, cashierName) values(@transno, @pid, @price, @qty, @sdate, @cashierName)", cn);
-                cm.Parameters.AddWithValue("@transno", transno);
-                cm.Parameters.AddWithValue("@pid", pcode);
-                cm.Parameters.AddWithValue("@price", price);
-                cm.Parameters.AddWithValue("@qty", int.Parse(txtQty.Text));
-                cm.Parameters.AddWithValue("@sdate", DateTime.Now);
-                cm.Parameters.AddWithValue("@cashierName", name);
-                cm.ExecuteNonQuery();
-                txtQty.Text = String.Empty;
-                cn.Close();
+                order.addBookToCart(transno, pcode, price, txtQty.Text, DateTime.Now, name);
                 formPos.loadCart();
                 this.Close();
             }

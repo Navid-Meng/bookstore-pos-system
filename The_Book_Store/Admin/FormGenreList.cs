@@ -9,19 +9,20 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
+using The_Book_Store.Admin.classes;
 
 namespace The_Book_Store.Admin
 {
     public partial class FormGenreList : Form
     {
-        SqlConnection cn = new SqlConnection();
-        SqlCommand cm = new SqlCommand();
-        DBConnection dbcon = new DBConnection();
-        SqlDataReader mySqlDataReader = null;
+        private readonly SqlConnection _connection;
+        private readonly DBConnection _db = new DBConnection();
+        private BookManager _bookManager;
         public FormGenreList()
         {
             InitializeComponent();
-            cn = new SqlConnection(dbcon.MyConnection());
+            _connection = new SqlConnection(_db.MyConnection());
+            _bookManager = new BookManager();
             LoadRecords();
         }
 
@@ -34,21 +35,25 @@ namespace The_Book_Store.Admin
         {
             int i = 0;
             dataGridViewGenre.Rows.Clear();
-            cn.Open();
-            cm = new SqlCommand("SELECT * FROM tblGenre WHERE genre LIKE '" + textBoxSearch.Text + "%' ORDER BY genre", cn);
-            mySqlDataReader = cm.ExecuteReader();
-            while (mySqlDataReader.Read())
+            _connection.Open(); 
+            SqlCommand cm = new SqlCommand("SELECT * FROM tblGenre WHERE genre LIKE '" + textBoxSearch.Text + "%'", _connection);
+            SqlDataReader reader = cm.ExecuteReader();
+            while (reader.Read())
             {
                 i++;
-                dataGridViewGenre.Rows.Add(i, mySqlDataReader["id"].ToString(), mySqlDataReader["genre"].ToString());
+                dataGridViewGenre.Rows.Add(i, reader["id"].ToString(), reader["genre"].ToString());
             }
-            mySqlDataReader.Close();
-            cn.Close();
+            reader.Close();
+            _connection.Close();
         }
 
         private void dataGridViewGenre_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
             string colName = dataGridViewGenre.Columns[e.ColumnIndex].Name;
+            if (colName != "Edit" && colName != "Delete")
+            {
+                return;
+            }
             if (colName == "Edit")
             {
                 FormGenreModule formGenreModule = new FormGenreModule(this, false);
@@ -62,16 +67,16 @@ namespace The_Book_Store.Admin
                 {
                     try
                     {
-                        cn.Open();
-                        cm = new SqlCommand("DELETE FROM tblGenre WHERE id LIKE '" + dataGridViewGenre[1, e.RowIndex].Value.ToString() + "'", cn);
+                        _connection.Open();
+                        SqlCommand cm = new SqlCommand("DELETE FROM tblGenre WHERE id LIKE '" + dataGridViewGenre[1, e.RowIndex].Value.ToString() + "'", _connection);
                         cm.ExecuteNonQuery();
-                        cn.Close();
+                        _connection.Close();
                         MessageBox.Show("Publisher has been successfully deleted!", "POS", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         LoadRecords();
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
-                        cn.Close();
+                        _connection.Close();
                         MessageBox.Show(ex.Message);
                     }
 
